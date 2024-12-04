@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "66409530195",
+    "project_id": "expopab-8a131",
+    "storage_bucket": "expopab-8a131.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:66409530195:android:e38ec34808884de52dd7a6",
+        "android_client_info": {
+          "package_name": "com.example.expopab"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTuCCqiG5cx0qt5jst3Jg2OKPB-wJpiKU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
