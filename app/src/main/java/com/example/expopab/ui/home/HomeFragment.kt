@@ -6,20 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.expopab.R
 import com.example.expopab.databinding.FragmentHomeBinding
 import com.example.expopab.model.EducationalContent
 import com.example.expopab.ui.home.adapter.EducationalContentAdapter
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private val adapter = EducationalContentAdapter()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -28,11 +26,20 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         loadDummyData()
+        setupClickListeners()
     }
 
     private fun setupRecyclerView() {
-        binding.contentRecyclerView.adapter = adapter
-        binding.contentRecyclerView.layoutManager = LinearLayoutManager(context)
+        binding.educationRecyclerView.adapter = adapter
+        binding.educationRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+    }
+
+    private fun setupClickListeners() {
+        binding.seeAllButton.setOnClickListener {
+            // Select Education tab in bottom navigation
+            val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNav)
+            bottomNav.selectedItemId = R.id.navigation_education
+        }
     }
 
     private fun loadDummyData() {
@@ -40,21 +47,21 @@ class HomeFragment : Fragment() {
             EducationalContent(
                 "1",
                 "Introduction to Android",
-                "Learn the basics of Android development including activities, fragments, and layouts",
+                "Learn the basics of Android development",
                 "",
                 "Android"
             ),
             EducationalContent(
                 "2",
                 "Kotlin Fundamentals",
-                "Master Kotlin programming language with hands-on examples and best practices",
+                "Master Kotlin programming language",
                 "",
                 "Programming"
             ),
             EducationalContent(
                 "3",
                 "UI Design Patterns",
-                "Explore modern Android UI design patterns and Material Design guidelines",
+                "Explore modern Android UI patterns",
                 "",
                 "Design"
             )

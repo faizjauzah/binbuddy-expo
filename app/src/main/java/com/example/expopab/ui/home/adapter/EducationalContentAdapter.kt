@@ -19,7 +19,7 @@ class EducationalContentAdapter : RecyclerView.Adapter<EducationalContentAdapter
                 contentDescription.text = content.description
                 contentCategory.text = content.category
                 // For now, using a placeholder for image
-                contentImage.setImageResource(R.drawable.red_circle)
+                contentImage.setImageResource(R.drawable.bg_educontent)
             }
         }
     }
