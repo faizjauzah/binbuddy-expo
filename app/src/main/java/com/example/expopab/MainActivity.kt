@@ -2,6 +2,7 @@ package com.example.expopab
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import com.example.expopab.databinding.ActivityMainBinding
 import com.example.expopab.ui.home.AccountFragment
 import com.example.expopab.ui.home.EducationFragment
@@ -11,11 +12,20 @@ import androidx.fragment.app.Fragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Initialize and setup toolbar
+        toolbar = binding.toolbar
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+
+        // Set initial toolbar title
+        supportActionBar?.title = "Home"
 
         setupBottomNavigation()
 
@@ -30,11 +40,31 @@ class MainActivity : AppCompatActivity() {
     private fun setupBottomNavigation() {
         binding.bottomNav.setOnItemSelectedListener { item ->
             val fragment = when (item.itemId) {
-                R.id.navigation_home -> HomeFragment()
-                R.id.navigation_education -> EducationFragment()
-                R.id.navigation_tracking -> TrackingFragment()
-                R.id.navigation_account -> AccountFragment()
-                else -> HomeFragment()
+                R.id.navigation_home -> {
+                    supportActionBar?.title = "Home"
+                    supportActionBar?.setDisplayHomeAsUpEnabled(false)
+                    HomeFragment()
+                }
+                R.id.navigation_education -> {
+                    supportActionBar?.title = "Education"
+                    supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                    EducationFragment()
+                }
+                R.id.navigation_tracking -> {
+                    supportActionBar?.title = "Tracking"
+                    supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                    TrackingFragment()
+                }
+                R.id.navigation_account -> {
+                    supportActionBar?.title = "Account"
+                    supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                    AccountFragment()
+                }
+                else -> {
+                    supportActionBar?.title = "Home"
+                    supportActionBar?.setDisplayHomeAsUpEnabled(false)
+                    HomeFragment()
+                }
             }
 
             supportFragmentManager.beginTransaction()
@@ -42,5 +72,12 @@ class MainActivity : AppCompatActivity() {
                 .commit()
             true
         }
+    }
+
+    // Handle Up button clicks
+    override fun onSupportNavigateUp(): Boolean {
+        // Navigate to Home fragment
+        binding.bottomNav.selectedItemId = R.id.navigation_home
+        return true
     }
 }
