@@ -11,11 +11,17 @@ import com.example.expopab.databinding.FragmentHomeBinding
 import com.example.expopab.model.EducationalContent
 import com.example.expopab.ui.home.adapter.EducationalContentAdapter
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private val adapter = EducationalContentAdapter()
+    private val eduAdapter = EducationalContentAdapter()
+    private val reminderList = mutableListOf<ReminderTime>()
+    private lateinit var reminderAdapter: ReminderAdapter
+    private val db = Firebase.firestore
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -24,14 +30,48 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupRecyclerView()
+        setupEducationRecyclerView()
+        setupReminderRecyclerView()
         loadDummyData()
         setupClickListeners()
     }
 
-    private fun setupRecyclerView() {
-        binding.educationRecyclerView.adapter = adapter
+    private fun setupEducationRecyclerView() {
+        binding.educationRecyclerView.adapter = eduAdapter
         binding.educationRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+    }
+
+    private fun setupReminderRecyclerView() {
+        reminderAdapter = ReminderAdapter(reminderList) { }
+        binding.reminderList.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = reminderAdapter
+        }
+    }
+
+    private fun loadReminders() {
+        db.collection("reminders")
+            .whereEqualTo("userId", Firebase.auth.currentUser?.uid)
+            .addSnapshotListener { snapshot, _ ->
+                if (_binding == null) return@addSnapshotListener
+                reminderList.clear()
+                snapshot?.forEach { document ->
+                    val reminder = document.toObject(ReminderTime::class.java)
+                    reminderList.add(reminder)
+                }
+                reminderAdapter.notifyDataSetChanged()
+                updateEmptyState()
+            }
+    }
+
+    private fun updateEmptyState() {
+        binding.emptyState.visibility = if (reminderList.isEmpty()) View.VISIBLE else View.GONE
+        binding.reminderList.visibility = if (reminderList.isEmpty()) View.GONE else View.VISIBLE
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadReminders()
     }
 
     private fun setupClickListeners() {
@@ -66,7 +106,7 @@ class HomeFragment : Fragment() {
                 "Design"
             )
         )
-        adapter.submitList(dummyContent)
+        eduAdapter.submitList(dummyContent)
     }
 
     override fun onDestroyView() {

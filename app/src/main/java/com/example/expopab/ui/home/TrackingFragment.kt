@@ -1,6 +1,6 @@
 package com.example.expopab.ui.home
-
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,14 +13,17 @@ import androidx.work.WorkManager
 import com.example.expopab.databinding.FragmentTrackingBinding
 import com.example.expopab.databinding.ItemReminderBinding
 import com.example.expopab.notification.TrashReminderWorker
-import java.util.Calendar
-import java.util.UUID
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.ktx.auth
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 data class ReminderTime(
     val id: String = UUID.randomUUID().toString(),
-    val hour: Int,
-    val minute: Int
+    val hour: Int = 0,
+    val minute: Int = 0,
+    val userId: String? = null
 )
 
 class ReminderAdapter(
@@ -51,6 +54,7 @@ class TrackingFragment : Fragment() {
     private val binding get() = _binding!!
     private val reminderList = mutableListOf<ReminderTime>()
     private lateinit var adapter: ReminderAdapter
+    private val db = Firebase.firestore
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,34 +67,60 @@ class TrackingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupRecyclerView()
 
         binding.timePicker.setIs24HourView(true)
         binding.setReminderButton.setOnClickListener {
-            val hour = binding.timePicker.hour
-            val minute = binding.timePicker.minute
-
-            val reminder = ReminderTime(hour = hour, minute = minute)
-            reminderList.add(reminder)
-            adapter.notifyItemInserted(reminderList.size - 1)
-
-            scheduleReminder(hour, minute)
-            Toast.makeText(context, "Reminder set for $hour:$minute", Toast.LENGTH_SHORT).show()
+            saveReminder(binding.timePicker.hour, binding.timePicker.minute)
         }
     }
 
     private fun setupRecyclerView() {
         adapter = ReminderAdapter(reminderList) { reminder ->
-            val position = reminderList.indexOf(reminder)
-            reminderList.remove(reminder)
-            adapter.notifyItemRemoved(position)
-            // Optional: Cancel the WorkManager task here
+            deleteReminder(reminder)
         }
 
         binding.reminderList.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = this@TrackingFragment.adapter
+        }
+    }
+
+    private fun saveReminder(hour: Int, minute: Int) {
+        val reminder = ReminderTime(
+            hour = hour,
+            minute = minute,
+            userId = getCurrentUserId()
+        )
+
+        db.collection("reminders")
+            .document(reminder.id)
+            .set(reminder)
+            .addOnSuccessListener {
+                scheduleReminder(hour, minute)
+                Toast.makeText(context, "Reminder set for $hour:$minute", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                Log.e("TrackingFragment", "Failed to save reminder", e)
+            }
+    }
+
+    private fun deleteReminder(reminder: ReminderTime) {
+        try {
+            db.collection("reminders")
+                .document(reminder.id)
+                .delete()
+                .addOnSuccessListener {
+                    // Successfully deleted
+                }
+                .addOnFailureListener { e ->
+                    Log.e("TrackingFragment", "Error deleting reminder", e)
+                    Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        } catch (e: Exception) {
+            Log.e("TrackingFragment", "Error in deleteReminder", e)
+            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -115,6 +145,33 @@ class TrackingFragment : Fragment() {
             .build()
 
         workManager.enqueue(reminderWork)
+    }
+
+    private fun getCurrentUserId(): String {
+        return Firebase.auth.currentUser?.uid ?: "default_user"
+    }
+
+    private fun loadReminders() {
+        db.collection("reminders")
+            .whereEqualTo("userId", getCurrentUserId())
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Toast.makeText(context, "Error loading reminders", Toast.LENGTH_SHORT).show()
+                    return@addSnapshotListener
+                }
+
+                reminderList.clear()
+                snapshot?.forEach { document ->
+                    val reminder = document.toObject(ReminderTime::class.java)
+                    reminderList.add(reminder)
+                }
+                adapter.notifyDataSetChanged()
+            }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadReminders()
     }
 
     override fun onDestroyView() {

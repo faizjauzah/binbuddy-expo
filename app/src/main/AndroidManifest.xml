@@ -18,6 +18,7 @@
         <activity
             android:name=".ui.auth.SignInActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             tools:ignore="WrongManifestParent">
             <!-- This intent-filter tells Android this is your launch activity -->
             <intent-filter>
