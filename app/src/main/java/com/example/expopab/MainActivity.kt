@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         // Set initial toolbar title
-        supportActionBar?.title = "Zakie"
+        supportActionBar?.title = "Home"
 
         setupBottomNavigation()
 
@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNav.setOnItemSelectedListener { item ->
             val fragment = when (item.itemId) {
                 R.id.navigation_home -> {
-                    supportActionBar?.title = "Zakie"
+                    supportActionBar?.title = "Home"
                     supportActionBar?.setDisplayHomeAsUpEnabled(false)
                     HomeFragment()
                 }
