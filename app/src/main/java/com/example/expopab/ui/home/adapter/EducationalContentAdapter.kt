@@ -8,28 +8,34 @@ import com.example.expopab.R
 import com.example.expopab.databinding.ItemEducationalContentBinding
 import com.example.expopab.model.EducationalContent
 
-class EducationalContentAdapter : RecyclerView.Adapter<EducationalContentAdapter.ContentViewHolder>() {
+class EducationalContentAdapter(
+    private val onItemClick: (EducationalContent) -> Unit = {}  // Add click handler
+) : RecyclerView.Adapter<EducationalContentAdapter.ContentViewHolder>() {
     private var contents = listOf<EducationalContent>()
 
     class ContentViewHolder(private val binding: ItemEducationalContentBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(content: EducationalContent) {
+        fun bind(content: EducationalContent, onItemClick: (EducationalContent) -> Unit) {
             binding.apply {
                 contentTitle.text = content.title
                 contentDescription.text = content.description
                 contentCategory.text = content.category
 
+                // Add click listener to the whole card
+                root.setOnClickListener {
+                    onItemClick(content)
+                }
+
                 // Load image using Glide
                 if (content.imageUrl.isNotEmpty()) {
                     Glide.with(itemView.context)
                         .load(content.imageUrl)
-                        .placeholder(R.drawable.bg_educontent) // Show placeholder while loading
-                        .error(R.drawable.bg_educontent) // Show placeholder if error occurs
+                        .placeholder(R.drawable.bg_educontent)
+                        .error(R.drawable.bg_educontent)
                         .centerCrop()
                         .into(contentImage)
                 } else {
-                    // If no image URL, show placeholder
                     contentImage.setImageResource(R.drawable.bg_educontent)
                 }
             }
@@ -43,7 +49,7 @@ class EducationalContentAdapter : RecyclerView.Adapter<EducationalContentAdapter
     }
 
     override fun onBindViewHolder(holder: ContentViewHolder, position: Int) {
-        holder.bind(contents[position])
+        holder.bind(contents[position], onItemClick)
     }
 
     override fun getItemCount() = contents.size

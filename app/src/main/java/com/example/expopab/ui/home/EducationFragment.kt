@@ -1,6 +1,9 @@
 package com.example.expopab.ui.home
 
+import com.example.expopab.ui.article.ArticleDetailActivity
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +12,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.expopab.databinding.FragmentEducationBinding
-import com.example.expopab.model.EducationalContent
 import com.example.expopab.ui.home.adapter.EducationalContentAdapter
 import com.example.expopab.viewmodel.EducationViewModel
 import kotlinx.coroutines.launch
@@ -17,7 +19,18 @@ import kotlinx.coroutines.launch
 class EducationFragment : Fragment() {
     private var _binding: FragmentEducationBinding? = null
     private val binding get() = _binding!!
-    private val adapter = EducationalContentAdapter()
+    // Update adapter initialization to include click handler
+    private val adapter = EducationalContentAdapter { content ->
+        Log.d("EducationFragment", "Clicked item: ${content.title}")
+        Intent(requireContext(), ArticleDetailActivity::class.java).apply {
+            putExtra("title", content.title)
+            putExtra("articleContent", content.articleContent)  // Change from description to articleContent
+            putExtra("imageUrl", content.imageUrl)
+            Log.d("EducationFragment", "Starting ArticleDetailActivity with title: ${content.title}")
+            startActivity(this)
+        }
+    }
+
     private val viewModel: EducationViewModel by viewModels()
 
     override fun onCreateView(

@@ -1,12 +1,13 @@
 package com.example.expopab.model
 
 data class EducationalContent(
-    val id: String = "",  // Making properties optional with default values
+    val id: String = "",
     val title: String = "",
     val description: String = "",
     val imageUrl: String = "",
-    val category: String = ""
+    val category: String = "",
+    val articleContent: String = ""  // Add this new field for the article
 ) {
     // Empty constructor for Firestore
-    constructor() : this("", "", "", "", "")
+    constructor() : this("", "", "", "", "", "")
 }

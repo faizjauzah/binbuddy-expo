@@ -37,6 +37,11 @@
             android:name=".MainActivity"
             android:exported="false"
             tools:ignore="Instantiatable,WrongManifestParent" />
+d
+        <activity
+            android:name=".ui.article.ArticleDetailActivity"
+            android:label="Article Detail"
+            android:parentActivityName=".MainActivity" />
 
     </application>
 

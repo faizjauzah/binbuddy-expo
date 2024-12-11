@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.expopab.R
 import com.example.expopab.databinding.FragmentHomeBinding
 import com.example.expopab.ui.home.EducationUIState
-import com.example.expopab.model.EducationalContent
 import com.example.expopab.ui.home.adapter.EducationalContentAdapter
 import com.example.expopab.ui.home.adapter.ReminderAdapter
 import com.example.expopab.ui.home.data.ReminderTime

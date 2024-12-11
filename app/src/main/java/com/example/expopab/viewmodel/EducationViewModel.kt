@@ -2,7 +2,6 @@ package com.example.expopab.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.expopab.model.EducationalContent
 import com.example.expopab.repository.EducationalContentRepository
 import com.example.expopab.ui.home.EducationUIState
 import kotlinx.coroutines.flow.MutableStateFlow
