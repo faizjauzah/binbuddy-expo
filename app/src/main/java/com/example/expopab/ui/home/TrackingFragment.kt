@@ -13,41 +13,14 @@ import androidx.work.WorkManager
 import com.example.expopab.databinding.FragmentTrackingBinding
 import com.example.expopab.databinding.ItemReminderBinding
 import com.example.expopab.notification.TrashReminderWorker
+import com.example.expopab.ui.home.adapter.ReminderAdapter
+import com.example.expopab.ui.home.data.ReminderTime
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.auth.ktx.auth
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-data class ReminderTime(
-    val id: String = UUID.randomUUID().toString(),
-    val hour: Int = 0,
-    val minute: Int = 0,
-    val userId: String? = null
-)
-
-class ReminderAdapter(
-    private val reminders: List<ReminderTime>,
-    private val onDeleteClick: (ReminderTime) -> Unit
-) : RecyclerView.Adapter<ReminderAdapter.ViewHolder>() {
-
-    class ViewHolder(val binding: ItemReminderBinding) : RecyclerView.ViewHolder(binding.root)
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemReminderBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false
-        )
-        return ViewHolder(binding)
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val reminder = reminders[position]
-        holder.binding.timeText.text = String.format("%02d:%02d", reminder.hour, reminder.minute)
-        holder.binding.deleteButton.setOnClickListener { onDeleteClick(reminder) }
-    }
-
-    override fun getItemCount() = reminders.size
-}
 
 class TrackingFragment : Fragment() {
     private var _binding: FragmentTrackingBinding? = null

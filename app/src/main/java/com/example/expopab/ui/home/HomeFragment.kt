@@ -5,15 +5,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.expopab.R
 import com.example.expopab.databinding.FragmentHomeBinding
+import com.example.expopab.ui.home.EducationUIState
 import com.example.expopab.model.EducationalContent
 import com.example.expopab.ui.home.adapter.EducationalContentAdapter
+import com.example.expopab.ui.home.adapter.ReminderAdapter
+import com.example.expopab.ui.home.data.ReminderTime
+import com.example.expopab.viewmodel.EducationViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
@@ -22,6 +30,10 @@ class HomeFragment : Fragment() {
     private val reminderList = mutableListOf<ReminderTime>()
     private lateinit var reminderAdapter: ReminderAdapter
     private val db = Firebase.firestore
+    private val viewModel: EducationViewModel by viewModels()
+
+    // Add this to store the listener registration
+    private var reminderListener: ListenerRegistration? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -32,13 +44,40 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupEducationRecyclerView()
         setupReminderRecyclerView()
-        loadDummyData()
+        viewModel.loadPreviewContent()
+        observeEducationalContent()
         setupClickListeners()
+        loadUserName() // Add this line to load the user's name
+    }
+
+    // Add this function to load the user's name
+    private fun loadUserName() {
+        val userId = Firebase.auth.currentUser?.uid
+        if (userId != null) {
+            binding.welcomeText.text = "Loading..." // Show loading state
+            db.collection("users")
+                .document(userId)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        val fullName = document.getString("fullName") ?: ""
+                        binding.welcomeText.text = "Welcome, $fullName"
+                    } else {
+                        binding.welcomeText.text = "Welcome"
+                    }
+                }
+                .addOnFailureListener {
+                    binding.welcomeText.text = "Welcome"
+                }
+        } else {
+            binding.welcomeText.text = "Welcome"
+        }
     }
 
     private fun setupEducationRecyclerView() {
         binding.educationRecyclerView.adapter = eduAdapter
-        binding.educationRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        binding.educationRecyclerView.layoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
     }
 
     private fun setupReminderRecyclerView() {
@@ -49,8 +88,51 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun observeEducationalContent() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.uiState.collect { state ->
+                updateEducationUIState(state)
+            }
+        }
+    }
+
+    private fun updateEducationUIState(state: EducationUIState) {
+        binding.apply {
+            when (state) {
+                is EducationUIState.Loading -> {
+                    educationLoadingBar.visibility = View.VISIBLE
+                    educationRecyclerView.visibility = View.GONE
+                    educationErrorText.visibility = View.GONE
+                }
+                is EducationUIState.Success -> {
+                    educationLoadingBar.visibility = View.GONE
+                    educationRecyclerView.visibility = View.VISIBLE
+                    educationErrorText.visibility = View.GONE
+                    eduAdapter.submitList(state.content)
+                }
+                is EducationUIState.Error -> {
+                    educationLoadingBar.visibility = View.GONE
+                    educationRecyclerView.visibility = View.GONE
+                    educationErrorText.apply {
+                        visibility = View.VISIBLE
+                        text = state.message
+                    }
+                }
+                is EducationUIState.Empty -> {
+                    educationLoadingBar.visibility = View.GONE
+                    educationRecyclerView.visibility = View.GONE
+                    educationErrorText.apply {
+                        visibility = View.VISIBLE
+                        text = "No educational content available"
+                    }
+                }
+            }
+        }
+    }
+
     private fun loadReminders() {
-        db.collection("reminders")
+        // Store the listener registration
+        reminderListener = db.collection("reminders")
             .whereEqualTo("userId", Firebase.auth.currentUser?.uid)
             .addSnapshotListener { snapshot, _ ->
                 if (_binding == null) return@addSnapshotListener
@@ -69,48 +151,23 @@ class HomeFragment : Fragment() {
         binding.reminderList.visibility = if (reminderList.isEmpty()) View.GONE else View.VISIBLE
     }
 
-    override fun onResume() {
-        super.onResume()
-        loadReminders()
-    }
-
     private fun setupClickListeners() {
         binding.seeAllButton.setOnClickListener {
-            // Select Education tab in bottom navigation
             val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNav)
             bottomNav.selectedItemId = R.id.navigation_education
         }
     }
 
-    private fun loadDummyData() {
-        val dummyContent = listOf(
-            EducationalContent(
-                "1",
-                "Introduction to Android",
-                "Learn the basics of Android development",
-                "",
-                "Android"
-            ),
-            EducationalContent(
-                "2",
-                "Kotlin Fundamentals",
-                "Master Kotlin programming language",
-                "",
-                "Programming"
-            ),
-            EducationalContent(
-                "3",
-                "UI Design Patterns",
-                "Explore modern Android UI patterns",
-                "",
-                "Design"
-            )
-        )
-        eduAdapter.submitList(dummyContent)
+    override fun onResume() {
+        super.onResume()
+        loadReminders()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // Remove the listener when the view is destroyed
+        reminderListener?.remove()
+        reminderListener = null
         _binding = null
     }
 }

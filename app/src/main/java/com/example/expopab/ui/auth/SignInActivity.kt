@@ -6,32 +6,41 @@ import android.util.Patterns
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.expopab.MainActivity
-import com.example.expopab.databinding.ActivitySignInBinding  // Import the generated binding class
+import com.example.expopab.databinding.ActivitySignInBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 
 class SignInActivity : AppCompatActivity() {
-    // Declare our binding variable at the class level so it's accessible throughout the activity
     private lateinit var binding: ActivitySignInBinding
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Initialize the binding by inflating the layout
+
+        // Check if user is coming from sign out
+        if (Firebase.auth.currentUser == null) {
+            // Clear the back stack
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+
         binding = ActivitySignInBinding.inflate(layoutInflater)
-        // Set the root view of the binding as the content view
         setContentView(binding.root)
 
         auth = Firebase.auth
+
+        // Check if user is already signed in
+        if (auth.currentUser != null) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+            return
+        }
 
         setupClickListeners()
     }
 
     private fun setupClickListeners() {
-        // Access views through the binding object
         binding.signInButton.setOnClickListener {
-            // Get text from EditText views through binding
             val email = binding.emailInput.text.toString()
             val password = binding.passwordInput.text.toString()
 
@@ -41,7 +50,6 @@ class SignInActivity : AppCompatActivity() {
         }
 
         binding.signUpButton.setOnClickListener {
-            // Navigate to SignUp Activity
             startActivity(Intent(this, SignUpActivity::class.java))
         }
     }
@@ -59,16 +67,33 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun signIn(email: String, password: String) {
+        // Disable the sign in button while processing
+        binding.signInButton.isEnabled = false
+
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
+                // Re-enable the sign in button
+                binding.signInButton.isEnabled = true
+
                 if (task.isSuccessful) {
-                    // Navigate to Main Activity
-                    startActivity(Intent(this, MainActivity::class.java))
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
                     finish()
                 } else {
-                    Toast.makeText(this, "Authentication failed: ${task.exception?.message}",
-                        Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Authentication failed: ${task.exception?.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Clear email and password fields when returning to this screen
+        binding.emailInput.text?.clear()
+        binding.passwordInput.text?.clear()
     }
 }

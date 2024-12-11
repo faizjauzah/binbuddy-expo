@@ -11,6 +11,9 @@ import com.example.expopab.utils.ValidationUtils
 import com.example.expopab.viewmodel.AuthViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.example.expopab.databinding.ActivitySignUpBinding  // ViewBinding import
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 
 class SignUpActivity : AppCompatActivity() {
     // Initialize ViewBinding - this replaces the synthetic properties
@@ -41,24 +44,30 @@ class SignUpActivity : AppCompatActivity() {
                 is AuthResult.Error -> {
                     showError(result.message)
                 }
+
+                AuthResult.Loading -> TODO()
             }
         }
     }
 
     private fun setupClickListeners() {
-        // Use binding to access views - this fixes the unresolved reference errors
         binding.signUpButton.setOnClickListener {
+            binding.signUpButton.isEnabled = false
+
             val name = binding.nameInput.text.toString()
             val email = binding.emailInput.text.toString()
             val password = binding.passwordInput.text.toString()
 
             if (validateInput(name, email, password)) {
-                viewModel.signUp(email, password)
+                // Pass the name along with email and password
+                viewModel.signUp(name, email, password)
+            } else {
+                binding.signUpButton.isEnabled = true
             }
         }
 
         binding.backToSignInButton.setOnClickListener {
-            finish() // Return to SignIn screen
+            finish()
         }
     }
 

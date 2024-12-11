@@ -5,7 +5,18 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Your existing education content -->
+    <TextView
+        android:id="@+id/welcomeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:text="Welcome" />
+
+    <!-- Educational Content Section -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -13,14 +24,37 @@
         android:textSize="20sp"
         android:textStyle="bold" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/educationRecyclerView"
+    <!-- Education Content Container -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:clipToPadding="false"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp" />
+        android:layout_marginTop="8dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/educationRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp" />
+
+        <ProgressBar
+            android:id="@+id/educationLoadingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/educationErrorText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="16dp"
+            android:textColor="@android:color/holo_red_dark"
+            android:visibility="gone" />
+
+    </FrameLayout>
 
     <Button
         android:id="@+id/seeAllButton"
@@ -28,14 +62,14 @@
         android:layout_height="wrap_content"
         android:text="See All" />
 
-    <!-- Added reminder section -->
+    <!-- Reminder Section -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Scheduled Reminders"
         android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp"/>
+        android:textStyle="bold" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/reminderList"
@@ -47,9 +81,9 @@
         android:id="@+id/emptyState"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No reminders scheduled"
         android:gravity="center"
-        android:visibility="gone"
-        android:padding="16dp"/>
+        android:padding="16dp"
+        android:text="No reminders scheduled"
+        android:visibility="gone" />
 
 </LinearLayout>

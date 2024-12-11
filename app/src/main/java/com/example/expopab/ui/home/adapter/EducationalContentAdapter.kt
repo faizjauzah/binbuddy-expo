@@ -3,6 +3,7 @@ package com.example.expopab.ui.home.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.expopab.R
 import com.example.expopab.databinding.ItemEducationalContentBinding
 import com.example.expopab.model.EducationalContent
@@ -18,8 +19,19 @@ class EducationalContentAdapter : RecyclerView.Adapter<EducationalContentAdapter
                 contentTitle.text = content.title
                 contentDescription.text = content.description
                 contentCategory.text = content.category
-                // For now, using a placeholder for image
-                contentImage.setImageResource(R.drawable.bg_educontent)
+
+                // Load image using Glide
+                if (content.imageUrl.isNotEmpty()) {
+                    Glide.with(itemView.context)
+                        .load(content.imageUrl)
+                        .placeholder(R.drawable.bg_educontent) // Show placeholder while loading
+                        .error(R.drawable.bg_educontent) // Show placeholder if error occurs
+                        .centerCrop()
+                        .into(contentImage)
+                } else {
+                    // If no image URL, show placeholder
+                    contentImage.setImageResource(R.drawable.bg_educontent)
+                }
             }
         }
     }
