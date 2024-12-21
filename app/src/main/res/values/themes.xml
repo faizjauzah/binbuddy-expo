@@ -21,4 +21,16 @@
         <item name="android:letterSpacing">0.025</item>
         <item name="android:textAllCaps">false</item>
     </style>
+
+    <style name="DaySelector">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginEnd">4dp</item>
+        <item name="android:layout_marginStart">4dp</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:background">@drawable/bg_day_selector</item>
+    </style>
 </resources>

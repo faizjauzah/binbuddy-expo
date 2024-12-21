@@ -4,7 +4,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,6 +31,8 @@ class TrackingFragment : Fragment() {
     private val reminderList = mutableListOf<ReminderTime>()
     private lateinit var adapter: ReminderAdapter
     private val db = Firebase.firestore
+    private val selectedDays = mutableSetOf<Int>()
+    private lateinit var dayButtons: List<TextView>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,10 +46,58 @@ class TrackingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
+        setupDaySelectors()
 
         binding.timePicker.setIs24HourView(true)
         binding.setReminderButton.setOnClickListener {
+            if (selectedDays.isEmpty()) {
+                Toast.makeText(context, "Please select at least one day", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             saveReminder(binding.timePicker.hour, binding.timePicker.minute)
+        }
+    }
+
+    private fun setupDaySelectors() {
+        dayButtons = listOf(
+            binding.minggu,
+            binding.senin,
+            binding.selasa,
+            binding.rabu,
+            binding.kamis,
+            binding.jumat,
+            binding.sabtu
+        )
+
+        dayButtons.forEachIndexed { index, textView ->
+            textView.setOnClickListener {
+                if (selectedDays.contains(index)) {
+                    selectedDays.remove(index)
+                    updateDayButtonState(textView, false)
+                } else {
+                    selectedDays.add(index)
+                    updateDayButtonState(textView, true)
+                }
+            }
+        }
+    }
+
+    private fun updateDayButtonState(textView: TextView, isSelected: Boolean) {
+        textView.isSelected = isSelected
+        // Update text color based on selection
+        textView.setTextColor(
+            if (isSelected)
+                ContextCompat.getColor(requireContext(), android.R.color.white)
+            else
+                ContextCompat.getColor(requireContext(), android.R.color.black)
+        )
+    }
+
+    // When loading existing reminder, update button states
+    private fun updateDayButtonsFromReminder(reminder: ReminderTime) {
+        dayButtons.forEachIndexed { index, button ->
+            val isSelected = reminder.selectedDays.contains(index)
+            updateDayButtonState(button, isSelected)
         }
     }
 
@@ -64,7 +116,8 @@ class TrackingFragment : Fragment() {
         val reminder = ReminderTime(
             hour = hour,
             minute = minute,
-            userId = getCurrentUserId()
+            userId = getCurrentUserId(),
+            selectedDays = selectedDays.toList()
         )
 
         db.collection("reminders")
@@ -101,51 +154,46 @@ class TrackingFragment : Fragment() {
     private fun scheduleReminder(hour: Int, minute: Int) {
         val workManager = WorkManager.getInstance(requireContext())
 
-        // Set up calendar for current time
-        val calendar = Calendar.getInstance()
-        val now = calendar.clone() as Calendar
+        selectedDays.forEach { dayOfWeek ->
+            // Calculate next occurrence of this day
+            val calendar = Calendar.getInstance()
+            val now = calendar.clone() as Calendar
 
-        // Schedule early reminder (10 minutes before)
-        val earlyCalendar = calendar.clone() as Calendar
-        earlyCalendar.set(Calendar.HOUR_OF_DAY, hour)
-        earlyCalendar.set(Calendar.MINUTE, minute - 10)
-        earlyCalendar.set(Calendar.SECOND, 0)
+            while (calendar.get(Calendar.DAY_OF_WEEK) != dayOfWeek + 1) {
+                calendar.add(Calendar.DAY_OF_MONTH, 1)
+            }
 
-        if (earlyCalendar.before(now)) {
-            earlyCalendar.add(Calendar.DAY_OF_MONTH, 1)
+            calendar.set(Calendar.HOUR_OF_DAY, hour)
+            calendar.set(Calendar.MINUTE, minute)
+            calendar.set(Calendar.SECOND, 0)
+
+            if (calendar.before(now)) {
+                calendar.add(Calendar.WEEK_OF_YEAR, 1)
+            }
+
+            val earlyCalendar = calendar.clone() as Calendar
+            earlyCalendar.add(Calendar.MINUTE, -10)
+
+            // Calculate delays
+            val earlyDelayMillis = earlyCalendar.timeInMillis - now.timeInMillis
+            val onTimeDelayMillis = calendar.timeInMillis - now.timeInMillis
+
+            // Create work requests for this day
+            val earlyData = workDataOf("isEarlyReminder" to true)
+            val onTimeData = workDataOf("isEarlyReminder" to false)
+
+            val earlyReminderWork = OneTimeWorkRequestBuilder<TrashReminderWorker>()
+                .setInitialDelay(earlyDelayMillis, TimeUnit.MILLISECONDS)
+                .setInputData(earlyData)
+                .build()
+
+            val onTimeReminderWork = OneTimeWorkRequestBuilder<TrashReminderWorker>()
+                .setInitialDelay(onTimeDelayMillis, TimeUnit.MILLISECONDS)
+                .setInputData(onTimeData)
+                .build()
+
+            workManager.enqueue(listOf(earlyReminderWork, onTimeReminderWork))
         }
-
-        // Schedule on-time reminder
-        val onTimeCalendar = calendar.clone() as Calendar
-        onTimeCalendar.set(Calendar.HOUR_OF_DAY, hour)
-        onTimeCalendar.set(Calendar.MINUTE, minute)
-        onTimeCalendar.set(Calendar.SECOND, 0)
-
-        if (onTimeCalendar.before(now)) {
-            onTimeCalendar.add(Calendar.DAY_OF_MONTH, 1)
-        }
-
-        // Calculate delays
-        val earlyDelayMillis = earlyCalendar.timeInMillis - now.timeInMillis
-        val onTimeDelayMillis = onTimeCalendar.timeInMillis - now.timeInMillis
-
-        // Create data for workers
-        val earlyData = workDataOf("isEarlyReminder" to true)
-        val onTimeData = workDataOf("isEarlyReminder" to false)
-
-        // Create work requests
-        val earlyReminderWork = OneTimeWorkRequestBuilder<TrashReminderWorker>()
-            .setInitialDelay(earlyDelayMillis, TimeUnit.MILLISECONDS)
-            .setInputData(earlyData)
-            .build()
-
-        val onTimeReminderWork = OneTimeWorkRequestBuilder<TrashReminderWorker>()
-            .setInitialDelay(onTimeDelayMillis, TimeUnit.MILLISECONDS)
-            .setInputData(onTimeData)
-            .build()
-
-        // Enqueue both work requests
-        workManager.enqueue(listOf(earlyReminderWork, onTimeReminderWork))
     }
 
     private fun getCurrentUserId(): String {

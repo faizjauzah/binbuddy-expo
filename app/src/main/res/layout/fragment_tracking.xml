@@ -6,6 +6,53 @@
     android:background="@color/light_grey"
     android:padding="16dp">
 
+    <!-- Add this LinearLayout above the TimePicker -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/minggu"
+            style="@style/DaySelector"
+            android:text="M" />
+
+        <TextView
+            android:id="@+id/senin"
+            style="@style/DaySelector"
+            android:text="S" />
+
+        <TextView
+            android:id="@+id/selasa"
+            style="@style/DaySelector"
+            android:text="S" />
+
+        <TextView
+            android:id="@+id/rabu"
+            style="@style/DaySelector"
+            android:text="R" />
+
+        <TextView
+            android:id="@+id/kamis"
+            style="@style/DaySelector"
+            android:text="K" />
+
+        <TextView
+            android:id="@+id/jumat"
+            style="@style/DaySelector"
+            android:text="J" />
+
+        <TextView
+            android:id="@+id/sabtu"
+            style="@style/DaySelector"
+            android:text="S" />
+
+        <!-- Add similar TextViews for other days -->
+
+    </LinearLayout>
+
     <TimePicker
         android:id="@+id/timePicker"
         android:layout_width="match_parent"

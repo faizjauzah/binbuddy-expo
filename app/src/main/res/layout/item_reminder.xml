@@ -29,6 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_day_selector"
             android:textSize="15sp"
             android:text="M" />
 
@@ -38,6 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_day_selector"
             android:textSize="15sp"
             android:text="S" />
         <TextView
@@ -46,6 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_day_selector"
             android:textSize="15sp"
             android:text="S" />
         <TextView
@@ -54,6 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_day_selector"
             android:textSize="15sp"
             android:text="R" />
         <TextView
@@ -62,6 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_day_selector"
             android:textSize="15sp"
             android:text="K" />
         <TextView
@@ -70,6 +75,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_day_selector"
             android:textSize="15sp"
             android:text="J" />
         <TextView
@@ -78,6 +84,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="24dp"
+            android:background="@drawable/bg_day_selector"
             android:textSize="15sp"
             android:text="S" />
 

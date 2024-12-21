@@ -11,7 +11,33 @@ class ReminderAdapter(
     private val onDeleteClick: (ReminderTime) -> Unit
 ) : RecyclerView.Adapter<ReminderAdapter.ViewHolder>() {
 
-    class ViewHolder(val binding: ItemReminderBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(val binding: ItemReminderBinding) : RecyclerView.ViewHolder(binding.root) {
+        private val dayTextViews = listOf(
+            binding.minggu,
+            binding.senin,
+            binding.selasa,
+            binding.rabu,
+            binding.kamis,
+            binding.jumat,
+            binding.sabtu
+        )
+
+        fun bind(reminder: ReminderTime) {
+            binding.timeText.text = String.format("%02d:%02d", reminder.hour, reminder.minute)
+
+            // Update day indicators
+            dayTextViews.forEachIndexed { index, textView ->
+                val isSelected = reminder.selectedDays.contains(index)
+                textView.isSelected = isSelected
+                textView.setTextColor(
+                    if (isSelected)
+                        textView.context.getColor(android.R.color.white)
+                    else
+                        textView.context.getColor(android.R.color.black)
+                )
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemReminderBinding.inflate(
@@ -21,9 +47,8 @@ class ReminderAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val reminder = reminders[position]
-        holder.binding.timeText.text = String.format("%02d:%02d", reminder.hour, reminder.minute)
-        holder.binding.deleteButton.setOnClickListener { onDeleteClick(reminder) }
+        holder.bind(reminders[position])
+        holder.binding.deleteButton.setOnClickListener { onDeleteClick(reminders[position]) }
     }
 
     override fun getItemCount() = reminders.size
