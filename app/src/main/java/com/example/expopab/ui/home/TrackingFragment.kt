@@ -210,9 +210,18 @@ class TrackingFragment : Fragment() {
                 }
 
                 reminderList.clear()
-                snapshot?.forEach { document ->
-                    val reminder = document.toObject(ReminderTime::class.java)
-                    reminderList.add(reminder)
+                snapshot?.documents?.mapNotNull { document ->
+                    document.toObject(ReminderTime::class.java)
+                }?.sortedWith(
+                    compareByDescending<ReminderTime> {
+                        it.createdAt
+                    }.thenBy {
+                        it.hour
+                    }.thenBy {
+                        it.minute
+                    }
+                )?.let {
+                    reminderList.addAll(it)
                 }
                 adapter.notifyDataSetChanged()
             }

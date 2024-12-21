@@ -87,4 +87,6 @@ dependencies {
     implementation ("io.noties.markwon:image:4.6.2")
     implementation ("io.noties.markwon:ext-tables:4.6.2")
 
+    implementation ("androidx.gridlayout:gridlayout:1.0.0")
+
 }

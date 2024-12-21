@@ -2,89 +2,113 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@color/light_grey"
     android:padding="16dp">
 
-    <!-- Add this LinearLayout above the TimePicker -->
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="16dp">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/minggu"
-            style="@style/DaySelector"
-            android:text="M" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/senin"
-            style="@style/DaySelector"
-            android:text="S" />
+            <androidx.gridlayout.widget.GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:columnCount="4"
+                app:rowCount="2"
+                app:useDefaultMargins="true">
 
-        <TextView
-            android:id="@+id/selasa"
-            style="@style/DaySelector"
-            android:text="S" />
+                <TextView
+                    android:id="@+id/minggu"
+                    style="@style/DaySelectorTracking"
+                    android:text="MIN"
+                    app:layout_columnWeight="1"
+                    app:layout_gravity="fill" />
 
-        <TextView
-            android:id="@+id/rabu"
-            style="@style/DaySelector"
-            android:text="R" />
+                <TextView
+                    android:id="@+id/senin"
+                    style="@style/DaySelectorTracking"
+                    android:text="SEN"
+                    app:layout_columnWeight="1"
+                    app:layout_gravity="fill" />
 
-        <TextView
-            android:id="@+id/kamis"
-            style="@style/DaySelector"
-            android:text="K" />
+                <TextView
+                    android:id="@+id/selasa"
+                    style="@style/DaySelectorTracking"
+                    android:text="SEL"
+                    app:layout_columnWeight="1"
+                    app:layout_gravity="fill" />
 
-        <TextView
-            android:id="@+id/jumat"
-            style="@style/DaySelector"
-            android:text="J" />
+                <TextView
+                    android:id="@+id/rabu"
+                    style="@style/DaySelectorTracking"
+                    android:text="RAB"
+                    app:layout_columnWeight="1"
+                    app:layout_gravity="fill" />
 
-        <TextView
-            android:id="@+id/sabtu"
-            style="@style/DaySelector"
-            android:text="S" />
+                <TextView
+                    android:id="@+id/kamis"
+                    style="@style/DaySelectorTracking"
+                    android:text="KAM"
+                    app:layout_columnWeight="1"
+                    app:layout_gravity="fill" />
 
-        <!-- Add similar TextViews for other days -->
+                <TextView
+                    android:id="@+id/jumat"
+                    style="@style/DaySelectorTracking"
+                    android:text="JUM"
+                    app:layout_columnWeight="1"
+                    app:layout_gravity="fill" />
 
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/sabtu"
+                    style="@style/DaySelectorTracking"
+                    android:text="SAB"
+                    app:layout_columnWeight="1"
+                    app:layout_gravity="fill" />
 
-    <TimePicker
-        android:id="@+id/timePicker"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:timePickerMode="spinner" />
+            </androidx.gridlayout.widget.GridLayout>
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/setReminderButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/bg_button"
-        android:backgroundTint="@color/purple_500"
-        android:layout_marginTop="16dp"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:text="Set Trash Pickup Reminder" />
+            <TimePicker
+                android:id="@+id/timePicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:timePickerMode="spinner" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:textColor="@color/black"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        android:text="List yang sudah dibuat" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/setReminderButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_button"
+                android:backgroundTint="@color/purple_500"
+                android:text="Set Trash Pickup Reminder"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/reminderList"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="16dp" />
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="List yang sudah dibuat"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/reminderList"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="16dp"
+                android:layout_weight="1" />
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

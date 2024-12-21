@@ -7,5 +7,6 @@ data class ReminderTime(
     val hour: Int = 0,
     val minute: Int = 0,
     val userId: String? = null,
-    val selectedDays: List<Int> = listOf() // 0 = Sunday, 1 = Monday, etc.
+    val selectedDays: List<Int> = listOf(),
+    val createdAt: Long = System.currentTimeMillis() // Add this line
 )
