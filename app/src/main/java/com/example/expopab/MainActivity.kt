@@ -1,6 +1,7 @@
 package com.example.expopab
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.example.expopab.databinding.ActivityMainBinding
@@ -43,26 +44,31 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home -> {
                     supportActionBar?.title = "Home"
                     supportActionBar?.setDisplayHomeAsUpEnabled(false)
+                    toolbar.visibility = View.GONE
                     HomeFragment()
                 }
                 R.id.navigation_education -> {
                     supportActionBar?.title = "Education"
                     supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                    toolbar.visibility = View.VISIBLE
                     EducationFragment()
                 }
                 R.id.navigation_tracking -> {
                     supportActionBar?.title = "Tracking"
                     supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                    toolbar.visibility = View.VISIBLE
                     TrackingFragment()
                 }
                 R.id.navigation_account -> {
                     supportActionBar?.title = "Account"
                     supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                    toolbar.visibility = View.VISIBLE
                     AccountFragment()
                 }
                 else -> {
                     supportActionBar?.title = "Home"
                     supportActionBar?.setDisplayHomeAsUpEnabled(false)
+                    toolbar.visibility = View.GONE
                     HomeFragment()
                 }
             }

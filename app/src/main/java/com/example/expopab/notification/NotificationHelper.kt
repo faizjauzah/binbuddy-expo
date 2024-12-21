@@ -27,7 +27,7 @@ class NotificationHelper(private val context: Context) {
         }
     }
 
-    fun showNotification() {
+    fun showEarlyNotification() {
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle("Trash Pickup Reminder")
@@ -37,5 +37,17 @@ class NotificationHelper(private val context: Context) {
 
         val notificationManager = context.getSystemService(NotificationManager::class.java)
         notificationManager.notify(1, notification)
+    }
+
+    fun showOnTimeNotification() {
+        val notification = NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle("Trash Pickup Now")
+            .setContentText("It's time for trash pickup!")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .build()
+
+        val notificationManager = context.getSystemService(NotificationManager::class.java)
+        notificationManager.notify(2, notification) // Different ID for second notification
     }
 }

@@ -8,7 +8,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.expopab.databinding.FragmentAccountBinding
+import com.example.expopab.ui.auth.SettingsActivity
 import com.example.expopab.ui.auth.SignInActivity
+import com.example.expopab.ui.auth.SignOutActivity
+import com.example.expopab.ui.auth.WelcomeActivity
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
@@ -48,24 +51,14 @@ class AccountFragment : Fragment() {
         }
 
         binding.signOutButton.setOnClickListener {
-            // Disable the button to prevent multiple clicks
-            binding.signOutButton.isEnabled = false
+            // Navigate to SignOut activity for confirmation
+            val intent = Intent(requireContext(), SignOutActivity::class.java)
+            startActivity(intent)
+        }
 
-            try {
-                // Sign out from Firebase
-                Firebase.auth.signOut()
-
-                // Navigate to SignIn activity
-                val intent = Intent(requireContext(), SignInActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-                requireActivity().finish()
-            } catch (e: Exception) {
-                // Re-enable the button if there's an error
-                binding.signOutButton.isEnabled = true
-                // Show error message
-                Toast.makeText(context, "Sign out failed: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+        binding.settingsButton.setOnClickListener {
+            val intent = Intent(requireContext(), SettingsActivity::class.java)
+            startActivity(intent)
         }
     }
 
@@ -82,6 +75,13 @@ class AccountFragment : Fragment() {
             .addOnFailureListener {
                 // Handle error if needed
             }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Firebase.auth.currentUser?.let { user ->
+            loadUserName(user.uid)
+        }
     }
 
     override fun onDestroyView() {

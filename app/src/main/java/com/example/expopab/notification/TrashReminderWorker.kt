@@ -10,7 +10,14 @@ class TrashReminderWorker(
 ) : Worker(context, workerParams) {
 
     override fun doWork(): Result {
-        NotificationHelper(applicationContext).showNotification()
+        val isEarlyReminder = inputData.getBoolean("isEarlyReminder", true)
+
+        if (isEarlyReminder) {
+            NotificationHelper(applicationContext).showEarlyNotification()
+        } else {
+            NotificationHelper(applicationContext).showOnTimeNotification()
+        }
+
         return Result.success()
     }
 }

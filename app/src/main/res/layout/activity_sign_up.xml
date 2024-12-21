@@ -7,6 +7,12 @@
     android:padding="16dp"
     android:gravity="center">
 
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="match_parent"
+        android:layout_height="297dp"
+        app:srcCompat="@drawable/logo_binbuddy" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -54,6 +60,7 @@
         android:id="@+id/signUpButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/bg_button"
         android:text="Create Account"/>
 
     <com.google.android.material.button.MaterialButton

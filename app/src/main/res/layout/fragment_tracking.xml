@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/light_grey"
     android:padding="16dp">
 
     <TimePicker
@@ -11,12 +12,26 @@
         android:layout_height="wrap_content"
         android:timePickerMode="spinner" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/setReminderButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/bg_button"
+        android:backgroundTint="@color/purple_500"
         android:layout_marginTop="16dp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
         android:text="Set Trash Pickup Reminder" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:text="List yang sudah dibuat" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/reminderList"

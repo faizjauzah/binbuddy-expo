@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.example.expopab.databinding.FragmentTrackingBinding
 import com.example.expopab.databinding.ItemReminderBinding
 import com.example.expopab.notification.TrashReminderWorker
@@ -100,24 +101,51 @@ class TrackingFragment : Fragment() {
     private fun scheduleReminder(hour: Int, minute: Int) {
         val workManager = WorkManager.getInstance(requireContext())
 
+        // Set up calendar for current time
         val calendar = Calendar.getInstance()
         val now = calendar.clone() as Calendar
 
-        calendar.set(Calendar.HOUR_OF_DAY, hour)
-        calendar.set(Calendar.MINUTE, minute - 10)
-        calendar.set(Calendar.SECOND, 0)
+        // Schedule early reminder (10 minutes before)
+        val earlyCalendar = calendar.clone() as Calendar
+        earlyCalendar.set(Calendar.HOUR_OF_DAY, hour)
+        earlyCalendar.set(Calendar.MINUTE, minute - 10)
+        earlyCalendar.set(Calendar.SECOND, 0)
 
-        if (calendar.before(now)) {
-            calendar.add(Calendar.DAY_OF_MONTH, 1)
+        if (earlyCalendar.before(now)) {
+            earlyCalendar.add(Calendar.DAY_OF_MONTH, 1)
         }
 
-        val delayMillis = calendar.timeInMillis - now.timeInMillis
+        // Schedule on-time reminder
+        val onTimeCalendar = calendar.clone() as Calendar
+        onTimeCalendar.set(Calendar.HOUR_OF_DAY, hour)
+        onTimeCalendar.set(Calendar.MINUTE, minute)
+        onTimeCalendar.set(Calendar.SECOND, 0)
 
-        val reminderWork = OneTimeWorkRequestBuilder<TrashReminderWorker>()
-            .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
+        if (onTimeCalendar.before(now)) {
+            onTimeCalendar.add(Calendar.DAY_OF_MONTH, 1)
+        }
+
+        // Calculate delays
+        val earlyDelayMillis = earlyCalendar.timeInMillis - now.timeInMillis
+        val onTimeDelayMillis = onTimeCalendar.timeInMillis - now.timeInMillis
+
+        // Create data for workers
+        val earlyData = workDataOf("isEarlyReminder" to true)
+        val onTimeData = workDataOf("isEarlyReminder" to false)
+
+        // Create work requests
+        val earlyReminderWork = OneTimeWorkRequestBuilder<TrashReminderWorker>()
+            .setInitialDelay(earlyDelayMillis, TimeUnit.MILLISECONDS)
+            .setInputData(earlyData)
             .build()
 
-        workManager.enqueue(reminderWork)
+        val onTimeReminderWork = OneTimeWorkRequestBuilder<TrashReminderWorker>()
+            .setInitialDelay(onTimeDelayMillis, TimeUnit.MILLISECONDS)
+            .setInputData(onTimeData)
+            .build()
+
+        // Enqueue both work requests
+        workManager.enqueue(listOf(earlyReminderWork, onTimeReminderWork))
     }
 
     private fun getCurrentUserId(): String {

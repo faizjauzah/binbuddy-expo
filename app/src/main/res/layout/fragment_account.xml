@@ -1,15 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp">
 
+    <FrameLayout
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="50dp"
+        android:background="@drawable/bg_profile"
+        >
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/ic_account" />
+
+    </FrameLayout>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Full Name"
         android:textStyle="bold"
+        android:textColor="@color/black"
         android:layout_marginBottom="8dp"/>
 
     <TextView
@@ -17,12 +35,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16sp"
+        android:textColor="@color/black"
         android:layout_marginBottom="24dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Email"
+        android:textColor="@color/black"
         android:textStyle="bold"
         android:layout_marginBottom="8dp"/>
 
@@ -31,6 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16sp"
+        android:textColor="@color/black"
         android:layout_marginBottom="24dp"/>
 
     <TextView
@@ -40,10 +61,23 @@
         android:textSize="16sp"
         android:layout_marginBottom="32dp"/>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/settingsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_button"
+        android:backgroundTint="@color/purple_500"
+        android:textColor="@color/white"
+        android:text="Settings"/>
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/signOutButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/bg_button"
+        android:backgroundTint="@color/purple_500"
+        android:textColor="@color/white"
         android:text="Sign Out"/>
 
 </LinearLayout>

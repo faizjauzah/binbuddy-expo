@@ -14,18 +14,32 @@
         android:theme="@style/Theme.ExpoPAB"
         tools:targetApi="31">
 
+        <activity
+            android:name=".ui.auth.WelcomeActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <!-- This is your SignInActivity declaration -->
         <activity
             android:name=".ui.auth.SignInActivity"
             android:exported="true"
             android:launchMode="singleTask"
             tools:ignore="WrongManifestParent">
-            <!-- This intent-filter tells Android this is your launch activity -->
+            <!-- This intent-filter tells Android this is your launch activity
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            -->
         </activity>
+
+        <activity
+            android:name=".ui.auth.SettingsActivity"
+            android:exported="false" />
 
         <!-- Other activities need to be declared too, but without the intent-filter -->
         <activity
@@ -37,11 +51,15 @@
             android:name=".MainActivity"
             android:exported="false"
             tools:ignore="Instantiatable,WrongManifestParent" />
-d
+
         <activity
             android:name=".ui.article.ArticleDetailActivity"
             android:label="Article Detail"
             android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".ui.auth.SignOutActivity"
+            android:exported="false" />
 
     </application>
 
